@@ -63,9 +63,9 @@ echo 'Geocoding geoms...'
 source $REPOLOC/developments_build/python/base/bin/activate
 time python $REPOLOC/developments_build/python/geocode_address_new.py
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/geo_create_tmp.sql
-psql -U $DBUSER -d $DBNAME -c "\\COPY development_tmp FROM 'developments_build/db-development-geocoding.csv' CSV HEADER;"
+psql -U $DBUSER -d $DBNAME -c "\\COPY development_tmp FROM 'developments_build/python/db-development-geocoding.csv' CSV HEADER;"
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/geo_merge.sql
-rm developments_build/db-development-geocoding.csv
+rm developments_build/python/db-development-geocoding.csv
 
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/geoaddress.sql
 

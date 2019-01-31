@@ -7,6 +7,7 @@ import asyncio
 import nest_asyncio
 import uvloop
 from geosupport import Geosupport
+from geosupport import GeosupportError
 
 #using uvloop policy
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -19,7 +20,7 @@ g = Geosupport()
 
 async def get_loc(uid, num, street, borough):
     try: 
-        geo = g.address(house_number=num, street_name=street, borough_code=borough)
+        geo = g['1A'](house_number=num, street_name=street, borough_code=borough,  mode='regular+tpad')
         try:
             sname = geo['BOE Preferred Street Name']
         except:
@@ -73,37 +74,48 @@ async def get_loc(uid, num, street, borough):
             council = geo['City Council District']
         except:
             council = ''
-        loc = {'uid' : uid,
-                'bbl' : bbl,
-                'bin' : b_in,
-                'hnum': hnum,
-                'sname': sname,
-                'bcode': bcode,
-                'cd'   : cd,
-                'nta'  : nta,
-                'ntan' : ntan,
-                'cblock': cblock,
-                'csd'   : csd,
-                'lat' : lat,
-                'lon' : lon, 
-                'council': council}
+        try: 
+            GRC = geo['Geosupport Return Code (GRC)']
+        except: 
+            GRC =''
+        try: 
+            GRC2 = geo['Geosupport Return Code 2 (GRC 2)']
+        except: 
+            GRC2 =''
+        try: 
+            msg = geo['Message']
+        except: 
+            msg = 'msg err'
+        loc = {'status': 'success', 
+                'output': {'uid' : uid,
+                    'bbl' : bbl,
+                    'bin' : b_in,
+                    'hnum': hnum,
+                    'sname': sname,
+                    'bcode': bcode,
+                    'cd'   : cd,
+                    'nta'  : nta,
+                    'ntan' : ntan,
+                    'cblock': cblock,
+                    'csd'   : csd,
+                    'lat' : lat,
+                    'lon' : lon, 
+                    'council': council,
+                    'GRC': GRC,
+                    'GRC2':GRC2, 
+                    'msg': msg}
+                }
         return(loc)
-    except:
-        loc = {'uid' : '',
-                'bbl' : '',
-                'bin' : '',
-                'hnum': '',
-                'sname': '',
-                'bcode': '',
-                'cd'   : '',
-                'nta'  : '',
-                'ntan' : '',
-                'cblock': '',
-                'csd'   : '',
-                'lat' : '',
-                'lon' : '',
-                'council': ''}
-        return(loc)
+    except GeosupportError as e:
+         loc = {'status': 'failure',
+                'output': {'uid' : uid,
+                            'input_hnum': num, 
+                            'input_street': street, 
+                            'input_borough': borough,
+                            'error_message':str(e),
+                            'alternative_names': e.result['List of Street Names']}
+                }
+         return(loc)
 
 
 async def bound_get_loc(sem, jobnum, num, street, borough):
@@ -158,4 +170,16 @@ if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     future = asyncio.ensure_future(run(number))
     lst = loop.run_until_complete(future)
-    pd.DataFrame(lst).to_csv('developments_build/python/db-development-geocoding.csv', index=False)
+    lst = list(filter(None, lst))
+    lst_success = [i['output'] for i in lst if i['status'] == 'success']
+    lst_failure = [i['output'] for i in lst if (i['status'] == 'failure')]
+
+    lst_failure_address = [i for i in lst_failure if i['alternative_names'] != []]
+    lst_failure_all = [{k:v for k, v in i.items() if k != 'alternative_names'} for i in lst_failure]
+
+    pd.DataFrame(lst_success).to_csv('developments_build/python/db-development-geocoding.csv', index=False)
+    pd.DataFrame(lst_failure_all).to_csv('developments_build/python/geocoding_errors.csv', index=False)
+
+    with open('developments_build/python/geocoding_failure.json', 'w') as outfile:
+        json.dump(lst_failure_address, outfile)
+    
