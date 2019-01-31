@@ -48,17 +48,19 @@ WHERE x_outlier = 'true'
 -- WHERE job_type = 'Alteration' AND (units_net::numeric >= 100 OR units_net::numeric <= 100)
 
 -- reporting possible duplicate records where the records have the same job_type and address and units_net > 0
+-- order by address then job type then units descending
 DROP TABLE IF EXISTS dev_qc_potentialdups;
 CREATE TABLE dev_qc_potentialdups AS (
 	WITH housing_export_rownum AS (
 	SELECT a.*, ROW_NUMBER()
     	OVER (PARTITION BY address, job_type
-      	ORDER BY address, job_type) AS row_number
+      	ORDER BY address, job_type, units_net::numeric DESC) AS row_number
   		FROM dev_export a
   		WHERE units_net::numeric > 0)
 	SELECT * 
 	FROM housing_export_rownum 
-	WHERE row_number = 2); 
+	WHERE address||job_type IN (SELECT address||job_type 
+	FROM housing_export_rownum WHERE row_number = 2));
 
 -- outputting records for research based on occupancy categories
 DROP TABLE IF EXISTS dev_qc_occupancyresearch;
