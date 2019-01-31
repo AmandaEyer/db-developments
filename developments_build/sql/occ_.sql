@@ -56,19 +56,6 @@ UPDATE developments
 SET occ_prop = 'Empty Lot'
 WHERE job_type = 'Demolition' AND occ_prop IS NULL;
 
-
--- category
--- set to Residential where exiting or proposed occupany is Residential
-UPDATE developments
-SET occ_category = 'Residential'
-WHERE upper(occ_init) LIKE '%RESIDENTIAL%' OR upper(occ_prop) LIKE '%RESIDENTIAL%'
-OR upper(occ_init) LIKE '%ASSISTED%LIVING%' OR upper(occ_prop) LIKE '%ASSISTED%LIVING%';
-
--- otherwise set to other
-UPDATE developments
-SET occ_category = 'Other'
-WHERE occ_category IS NULL;
-
 -- Set occ_init = 'Garage/Miscellaneous' AND occ_prop = 'Garage/Miscellaneous'
 -- Where job_type is Demolition or Alteration
 -- AND address contains REAR or where job_description contains GARAGE 
@@ -84,8 +71,7 @@ OR (job_type = 'Alteration'
 -- Where job_type = New Building
 -- job_description contains '%GARAGE%' and does NOT contain any of the following: %Res%, %Dwell%, %house%,%home%, %apart%, %family%
 UPDATE developments
-SET occ_init = 'Garage/Miscellaneous',
-	occ_prop = 'Garage/Miscellaneous'
+SET occ_prop = 'Garage/Miscellaneous'
 WHERE (job_type = 'New Building' 
 	AND (upper(job_description) LIKE '%GARAGE%' 
 		AND upper(job_description) NOT LIKE '%RES%'
@@ -94,3 +80,16 @@ WHERE (job_type = 'New Building'
 		AND upper(job_description) NOT LIKE '%HOME%'
 		AND upper(job_description) NOT LIKE '%APART%'
 		AND upper(job_description) NOT LIKE '%FAMILY%'));
+
+-- category
+-- set to Residential where exiting or proposed occupany is Residential
+UPDATE developments
+SET occ_category = 'Residential'
+WHERE upper(occ_init) LIKE '%RESIDENTIAL%' OR upper(occ_prop) LIKE '%RESIDENTIAL%'
+OR upper(occ_init) LIKE '%ASSISTED%LIVING%' OR upper(occ_prop) LIKE '%ASSISTED%LIVING%';
+
+-- otherwise set to other
+UPDATE developments
+SET occ_category = 'Other'
+WHERE occ_category IS NULL;
+
