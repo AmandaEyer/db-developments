@@ -12,6 +12,7 @@ CREATE TABLE development_tmp(
     hnum text,
     lat text,
     lon text,
+    msg text, 
     nta text,
     ntan text,
     sname text,

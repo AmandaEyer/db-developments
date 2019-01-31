@@ -20,7 +20,7 @@ g = Geosupport()
 
 async def get_loc(uid, num, street, borough):
     try: 
-        geo = g.address(house_number=num, street_name=street, borough_code=borough,  mode='regular+tpad')
+        geo = g['1A'](house_number=num, street_name=street, borough_code=borough,  mode='regular+tpad')
         try:
             sname = geo['BOE Preferred Street Name']
         except:
@@ -82,6 +82,10 @@ async def get_loc(uid, num, street, borough):
             GRC2 = geo['Geosupport Return Code 2 (GRC 2)']
         except: 
             GRC2 =''
+        try: 
+            msg = geo['Message']
+        except: 
+            msg = 'msg err'
         loc = {'status': 'success', 
                 'output': {'uid' : uid,
                     'bbl' : bbl,
@@ -98,7 +102,8 @@ async def get_loc(uid, num, street, borough):
                     'lon' : lon, 
                     'council': council,
                     'GRC': GRC,
-                    'GRC2':GRC2}
+                    'GRC2':GRC2, 
+                    'msg': msg}
                 }
         return(loc)
     except GeosupportError as e:
@@ -167,7 +172,14 @@ if __name__ == "__main__":
     lst = loop.run_until_complete(future)
     lst = list(filter(None, lst))
     lst_success = [i['output'] for i in lst if i['status'] == 'success']
-    lst_failure = [i['output'] for i in lst if i['status'] == 'failure']
+    lst_failure = [i['output'] for i in lst if (i['status'] == 'failure')]
+
+    lst_failure_address = [i for i in lst_failure if i['alternative_names'] != []]
+    lst_failure_all = [{k:v for k, v in i.items() if k != 'alternative_names'} for i in lst_failure]
+
     pd.DataFrame(lst_success).to_csv('developments_build/python/db-development-geocoding.csv', index=False)
+    pd.DataFrame(lst_failure_all).to_csv('developments_build/python/geocoding_errors.csv', index=False)
+
     with open('developments_build/python/geocoding_failure.json', 'w') as outfile:
-        json.dump(lst_failure, outfile)
+        json.dump(lst_failure_address, outfile)
+    
