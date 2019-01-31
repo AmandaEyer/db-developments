@@ -2,7 +2,7 @@
 -- units_net_complete = max(dob_cofos.numofdwellingunits)
 
 UPDATE developments a
-SET units_net_complete = b.max_unit
+SET units_complete = b.max_unit
 FROM (
     SELECT jobnum, max(numofdwellingunits) AS max_unit
     FROM dob_cofos
