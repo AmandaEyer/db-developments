@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS development_tmp;
 CREATE TABLE development_tmp(
+    GRC text,
+    GRC2 text,
     bbl text,
     bcode text,
     bin text,
