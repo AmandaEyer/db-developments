@@ -19,7 +19,7 @@ g = Geosupport()
 
 async def get_loc(uid, num, street, borough):
     try: 
-        geo = g.address(house_number=num, street_name=street, borough_code=borough)
+        geo = g.address(house_number=num, street_name=street, borough_code=borough,  mode='regular+tpad')
         try:
             sname = geo['BOE Preferred Street Name']
         except:
@@ -89,7 +89,7 @@ async def get_loc(uid, num, street, borough):
                 'council': council}
         return(loc)
     except:
-        loc = {'uid' : '',
+        loc = {'uid' : uid,
                 'bbl' : '',
                 'bin' : '',
                 'hnum': '',
