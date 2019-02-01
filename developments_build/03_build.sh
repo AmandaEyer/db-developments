@@ -45,7 +45,7 @@ psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/unitscomplete.sql
 
 echo 'Outputting records for research'
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/qc_outlier.sql
-psql -U $DBUSER -d $DBNAME -c "COPY (SELECT * FROM qc_outliers WHERE job_number NOT IN (SELECT DISTINCT job_number FROM qc_outliersacrhived WHERE outlier = 'N' OR outlier = 'C')) TO '$REPOLOC/db-developments/developments_build/output/qc_outliers.csv' DELIMITER ',' CSV HEADER;"
+psql -U $DBUSER -d $DBNAME -c "COPY (SELECT * FROM qc_outliers WHERE job_number NOT IN (SELECT DISTINCT job_number FROM qc_outliersacrhived WHERE outlier = 'N' OR outlier = 'C') AND job_number NOT IN (SELECT DISTINCT job_number FROM developments WHERE x_dcpedited <> 'true')) TO '$REPOLOC/db-developments/developments_build/output/qc_outliers.csv' DELIMITER ',' CSV HEADER;"
 psql -U $DBUSER -d $DBNAME -c "COPY (SELECT * FROM qc_outliersacrhived) TO '$REPOLOC/db-developments/developments_build/output/qc_outliersacrhived.csv' DELIMITER ',' CSV HEADER;"
 
 
