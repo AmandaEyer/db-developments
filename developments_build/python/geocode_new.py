@@ -19,10 +19,9 @@ nest_asyncio.apply()
 g = Geosupport()
 
 async def get_loc(uid, num, street, borough):
-    try: 
-        geo = g['1B'](house_number=num, street_name=street, borough_code=borough,  mode='regular+tpad')
+    def get_output(uid, geo):
         try:
-            sname = geo['BOE Preferred Street Name']
+           sname = geo['BOE Preferred Street Name']
         except:
             sname = ''
         try:
@@ -86,6 +85,7 @@ async def get_loc(uid, num, street, borough):
             msg = geo['Message']
         except: 
             msg = 'msg err'
+            
         loc = {'status': 'success', 
                 'output': {'uid' : uid,
                     'bbl' : bbl,
@@ -103,10 +103,17 @@ async def get_loc(uid, num, street, borough):
                     'council': council,
                     'GRC': GRC,
                     'GRC2':GRC2, 
-                    'msg': msg}
+                    'msg': msg} 
                 }
         return(loc)
-    except GeosupportError as e:
+    try: #check PAD first
+        geo = g['1B'](house_number=num, street_name=street, borough_code=borough,  mode='regular')
+        return get_output(uid, geo)
+    except: #if not in PAD 
+        try: #check TPAD
+            geo = g['1B'](house_number=num, street_name=street, borough_code=borough,  mode='tpad')
+            return get_output(uid, geo)
+        except GeosupportError as e: #if not in TPAD nor PAD raise error
          loc = {'status': 'failure',
                 'output': {'uid' : uid,
                             'input_hnum': num, 
@@ -116,7 +123,6 @@ async def get_loc(uid, num, street, borough):
                             'alternative_names': e.result['List of Street Names']}
                 }
          return(loc)
-
 
 async def bound_get_loc(sem, jobnum, num, street, borough):
     async with sem:
