@@ -34,6 +34,7 @@ echo 'Calculating data attributes'
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/occ_.sql
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/statusq.sql
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/units_.sql
+psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/units_hotels.sql
 
 echo 'Adding on CO data attributes'
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/cotable.sql 
@@ -53,8 +54,6 @@ psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/x_inactive.sql
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/x_mixeduse.sql
 psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/x_outlier.sql
 
-## not implementing until issue number 8 is addressed
-## psql -U $DBUSER -d $DBNAME -f $REPOLOC/developments_build/sql/units_hotels.sql
 
 
 echo 'Geocoding geoms...'
