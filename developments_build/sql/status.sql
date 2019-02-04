@@ -24,15 +24,18 @@ DROP COLUMN x_withdrawal;
 UPDATE developments
 SET status = 'In progress'
 WHERE status_p IS NOT NULL
-	AND status NOT LIKE '%Complete%';
+	AND status NOT LIKE '%Complete%'
+	AND status NOT LIKE '%Withdrawn%';
 
 -- set the status to Permit Issued if there is a date in status Q
 UPDATE developments
 SET status = 'Permit issued'
 WHERE status_q IS NOT NULL
-	AND status NOT LIKE '%Complete%';
+	AND status NOT LIKE '%Complete%'
+	AND status NOT LIKE '%Withdrawn%';
 
 -- set the status to Complete where a TCO or FCO has been issued
 UPDATE developments a
 SET status = 'Complete'
-WHERE co_earliest_effectivedate IS NOT NULL;
+WHERE co_earliest_effectivedate IS NOT NULL
+AND status NOT LIKE '%Withdrawn%';
