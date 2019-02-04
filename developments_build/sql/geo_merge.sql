@@ -14,4 +14,4 @@ SET geo_bbl = b.bbl,
 FROM development_tmp b
 WHERE a.job_number = b.uid;
 
-DROP TABLE development_tmp;
+-- DROP TABLE development_tmp;

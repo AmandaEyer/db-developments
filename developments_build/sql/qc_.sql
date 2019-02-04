@@ -56,7 +56,9 @@ CREATE TABLE dev_qc_potentialdups AS (
     	OVER (PARTITION BY address, job_type
       	ORDER BY address, job_type, units_net::numeric DESC) AS row_number
   		FROM dev_export a
-  		WHERE units_net::numeric > 0)
+  		WHERE units_net::numeric > 0
+  		AND x_inactive <> 'true'
+  		AND status <> 'Withdrawn')
 	SELECT * 
 	FROM housing_export_rownum 
 	WHERE address||job_type IN (SELECT address||job_type 

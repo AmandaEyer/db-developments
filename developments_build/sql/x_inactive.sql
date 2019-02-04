@@ -11,5 +11,10 @@ UPDATE developments
 	AND (CURRENT_DATE - status_date::date)/365 >= 3;
 
 UPDATE developments
+	SET x_inactive = TRUE
+	WHERE status = 'In progress'
+	AND (CURRENT_DATE - status_date::date)/365 >= 3;
+
+UPDATE developments
 	SET x_inactive = FALSE
 	WHERE x_inactive IS NULL;
