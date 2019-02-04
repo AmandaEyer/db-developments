@@ -1,7 +1,9 @@
 x_geomsource,count
-BBL DCP,20
-BBL DOB,1962
-BBL geosupport,1
-Lat/Long DCP,180
+BBL DCP,15
+BBL DOB DTM,236
+BBL DOB MapPLUTO,1962
+BBL geosupport MapPLUTO,1
+Lat/Long DCP,134
+Lat/Long DOB,2
 Lat/Long geosupport,94660
-,946
+,759
