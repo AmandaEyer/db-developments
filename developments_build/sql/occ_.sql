@@ -81,6 +81,23 @@ WHERE (job_type = 'New Building'
 		AND upper(job_description) NOT LIKE '%APART%'
 		AND upper(job_description) NOT LIKE '%FAMILY%'));
 
+-- Whenthere are multiple new building jobs that share the same address and net units
+-- if 1 does not mention garage, change occ_prop to garage for records where job decription contains garage
+WITH nongaragejobs AS (
+	SELECT address, job_type, units_net, job_description
+	FROM developments
+	WHERE upper(job_description) NOT LIKE '%GARAGE%'
+	AND job_type = 'New Building'
+	AND occ_prop <> 'Garage/Miscellaneous')
+UPDATE developments a 
+SET occ_prop = 'Garage/Miscellaneous'
+FROM nongaragejobs b
+WHERE a.address = b.address
+	AND a.job_type = b.job_type
+	AND a.units_net = b.units_net
+	AND upper(a.job_description) LIKE '%GARAGE%'
+	AND occ_prop <> 'Garage/Miscellaneous';
+
 -- category
 -- set to Residential where exiting or proposed occupany is Residential
 UPDATE developments
