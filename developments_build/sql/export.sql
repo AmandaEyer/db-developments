@@ -13,6 +13,7 @@ CREATE TABLE dev_export AS
 	WHERE (co_earliest_effectivedate::date >= '2010-01-01' AND co_earliest_effectivedate::date <=  '2018-12-31')
 	OR (co_earliest_effectivedate IS NULL AND status_q::date >= '2010-01-01' AND status_q::date <=  '2018-12-31')
 	OR (co_earliest_effectivedate IS NULL AND status_q IS NULL AND status_a::date >= '2010-01-01' AND status_a::date <=  '2018-12-31')
+	AND x_outlier <> 'true'
 	);
 
 DROP TABLE IF EXISTS housing_export;
@@ -28,7 +29,14 @@ CREATE TABLE housing_export AS
 		SELECT DISTINCT job_number 
 		FROM developments
 		WHERE job_type = 'New Building' AND occ_prop = 'Hotel or Dormitory' AND x_mixeduse IS NULL)
+	AND x_outlier <> 'true'
 	);
+
+-- drop outlier column from final output
+ALTER TABLE dev_export
+DROP COLUMN x_outlier;
+ALTER TABLE housing_export
+DROP COLUMN x_outlier;
 
 -- export
 --all records
