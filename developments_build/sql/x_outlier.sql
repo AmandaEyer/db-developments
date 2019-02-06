@@ -6,10 +6,10 @@ WHERE job_number IN
 			WHERE job_number NOT IN 
 			(SELECT DISTINCT job_number 
 				FROM qc_outliersacrhived 
-				WHERE outlier = 'N' OR outlier = 'C') 
+				WHERE outlier = 'N') 
 			AND job_number NOT IN 
 			(SELECT DISTINCT job_number 
 				FROM developments 
-				WHERE x_dcpedited <> 'true'));
+				WHERE x_dcpedited = 'true'));
 -- Remove the data table
 DROP TABLE IF EXISTS qc_outliers;
