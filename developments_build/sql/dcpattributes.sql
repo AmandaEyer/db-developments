@@ -83,6 +83,14 @@ FROM housing_input_dcpattributes b
 WHERE upper(b.x_mixeduse) = 'TRUE'
 	AND a.job_number=b.job_number;
 
+UPDATE developments a
+SET x_inactive = TRUE,
+	x_dcpedited = TRUE,
+	x_reason = b.reason
+FROM housing_input_dcpattributes b
+WHERE upper(b.x_inactive) = 'TRUE'
+	AND a.job_number=b.job_number;
+
 -- UPDATE developments a
 -- SET co_latest_units = TRIM(b.c_u_latest),
 -- 	x_dcpedited = TRUE,
